@@ -17,6 +17,7 @@
             <TextBlock Text="Введіть дату народження:" Margin="5"/>
             <DatePicker SelectedDate="{Binding DateOfBirth, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
             <Button Content="Proceed" Command="{Binding ProceedCommand}" IsEnabled="{Binding CanProceed}" Margin="5"/>
+            <TextBlock Text="Результат:" Margin="5"/>
             <TextBlock Text="{Binding Result}" TextWrapping="Wrap" Margin="5"/>
         </StackPanel>
     </Grid>

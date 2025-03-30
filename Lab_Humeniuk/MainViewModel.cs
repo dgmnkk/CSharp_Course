@@ -105,7 +105,7 @@ namespace Lab_Humeniuk
                 }
 
                 Result = $"Ім'я: {person.FirstName}\nПрізвище: {person.LastName}\nEmail: {person.Email}\nДата народження: {person.BirthDate}\n" +
-                         $"Дорослий: {person.IsAdult}\nЗнак зодіаку: {person.SunSign}\nКитайський знак: {person.ChineseSign}\nДень народження сьогодні: {person.IsBirthday}";
+                         $"Повнолітній: {person.IsAdult}\nЗнак зодіаку: {person.SunSign}\nКитайський знак: {person.ChineseSign}\nДень народження сьогодні: {person.IsBirthday}";
             });
         }
 
