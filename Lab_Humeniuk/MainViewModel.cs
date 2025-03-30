@@ -1,112 +1,117 @@
 ﻿using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows;
+using Lab_Humeniuk.Models;
+using CommunityToolkit.Mvvm.Input;
+
 
 namespace Lab_Humeniuk
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private DateTime? _birthDate;
-        private string _ageText;
-        private string _westernZodiac;
-        private string _chineseZodiac;
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public DateTime? BirthDate
+        private string firstName;
+        private string lastName;
+        private string email;
+        private DateTime dateOfBirth = DateTime.Now;
+        private string result;
+
+        public string FirstName
         {
-            get => _birthDate;
+            get => firstName;
             set
             {
-                _birthDate = value;
-                OnPropertyChanged(nameof(BirthDate));
+                firstName = value;
+                OnPropertyChanged(nameof(FirstName));
+                OnPropertyChanged(nameof(CanProceed));
+                ((AsyncRelayCommand)ProceedCommand).NotifyCanExecuteChanged();
             }
         }
 
-        public string AgeText
+        public string LastName
         {
-            get => _ageText;
+            get => lastName;
             set
             {
-                _ageText = value;
-                OnPropertyChanged(nameof(AgeText));
+                lastName = value;
+                OnPropertyChanged(nameof(LastName));
+                OnPropertyChanged(nameof(CanProceed));
+                ((AsyncRelayCommand)ProceedCommand).NotifyCanExecuteChanged();
             }
         }
 
-        public string WesternZodiac
+        public string Email
         {
-            get => _westernZodiac;
+            get => email;
             set
             {
-                _westernZodiac = value;
-                OnPropertyChanged(nameof(WesternZodiac));
+                email = value;
+                OnPropertyChanged(nameof(Email));
+                OnPropertyChanged(nameof(CanProceed));
+                ((AsyncRelayCommand)ProceedCommand).NotifyCanExecuteChanged();
             }
         }
 
-        public string ChineseZodiac
+        public DateTime DateOfBirth
         {
-            get => _chineseZodiac;
+            get => dateOfBirth;
             set
             {
-                _chineseZodiac = value;
-                OnPropertyChanged(nameof(ChineseZodiac));
+                dateOfBirth = value;
+                OnPropertyChanged(nameof(DateOfBirth));
+                OnPropertyChanged(nameof(CanProceed));
+                ((AsyncRelayCommand)ProceedCommand).NotifyCanExecuteChanged();
             }
         }
 
-        public void Calculate()
+        public string Result
         {
-            if (BirthDate == null)
+            get => result;
+            set
             {
-                MessageBox.Show("Будь ласка, введіть дату народження.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            DateTime birthDate = BirthDate.Value;
-            int age = DateTime.Now.Year - birthDate.Year;
-            if (birthDate.Date > DateTime.Now.AddYears(-age)) age--;
-
-            if (age < 0 || age > 135)
-            {
-                MessageBox.Show("Введено некоректний вік.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            AgeText = $"Ваш вік: {age} років";
-            WesternZodiac = $"Західний знак: {GetWesternZodiac(birthDate)}";
-            ChineseZodiac = $"Китайський знак: {GetChineseZodiac(birthDate.Year)}";
-
-            if (birthDate.Month == DateTime.Now.Month && birthDate.Day == DateTime.Now.Day)
-            {
-                MessageBox.Show("Вітаємо з Днем Народження! 🎉", "Святкуємо!", MessageBoxButton.OK, MessageBoxImage.Information);
+                result = value;
+                OnPropertyChanged(nameof(Result));
             }
         }
 
-        private string GetWesternZodiac(DateTime birthDate)
+        public bool CanProceed => !string.IsNullOrWhiteSpace(FirstName) &&
+                                  !string.IsNullOrWhiteSpace(LastName) &&
+                                  !string.IsNullOrWhiteSpace(Email) &&
+                                  DateOfBirth != DateTime.MinValue;
+
+        public ICommand ProceedCommand { get; }
+
+        public MainViewModel()
         {
-            int day = birthDate.Day, month = birthDate.Month;
-            return (month, day) switch
-            {
-                (1, >= 20) or (2, <= 18) => "Водолій",
-                (2, >= 19) or (3, <= 20) => "Риби",
-                (3, >= 21) or (4, <= 19) => "Овен",
-                (4, >= 20) or (5, <= 20) => "Телець",
-                (5, >= 21) or (6, <= 20) => "Близнюки",
-                (6, >= 21) or (7, <= 22) => "Рак",
-                (7, >= 23) or (8, <= 22) => "Лев",
-                (8, >= 23) or (9, <= 22) => "Діва",
-                (9, >= 23) or (10, <= 22) => "Терези",
-                (10, >= 23) or (11, <= 21) => "Скорпіон",
-                (11, >= 22) or (12, <= 21) => "Стрілець",
-                _ => "Козеріг"
-            };
+            ProceedCommand = new AsyncRelayCommand(ProceedAsync, () => CanProceed);
         }
 
-        private string GetChineseZodiac(int year)
+        private async Task ProceedAsync()
         {
-            string[] animals = { "Мавпа", "Півень", "Собака", "Свиня", "Щур", "Бик", "Тигр", "Кролик", "Дракон", "Змія", "Кінь", "Коза" };
-            return animals[year % 12];
+            await Task.Run(() =>
+            {
+                if (DateOfBirth > DateTime.Now || DateTime.Now.Year - DateOfBirth.Year > 135)
+                {
+                    System.Windows.MessageBox.Show("Дата народження некоректна!");
+                    return;
+                }
+
+                var person = new Person(FirstName, LastName, Email, DateOfBirth);
+
+                if (person.IsBirthday)
+                {
+                    System.Windows.MessageBox.Show("З Днем Народження!");
+                }
+
+                Result = $"Ім'я: {person.FirstName}\nПрізвище: {person.LastName}\nEmail: {person.Email}\nДата народження: {person.BirthDate}\n" +
+                         $"Дорослий: {person.IsAdult}\nЗнак зодіаку: {person.SunSign}\nКитайський знак: {person.ChineseSign}\nДень народження сьогодні: {person.IsBirthday}";
+            });
         }
 
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

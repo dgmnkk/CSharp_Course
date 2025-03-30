@@ -5,17 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lab_Humeniuk"
         mc:Ignorable="d"
-        Title="Розрахунок віку та знаків зодіаку" Height="300" Width="400">
+        Title="Lab2" Height="450" Width="400">
     <Grid Margin="10">
         <StackPanel>
-            <TextBlock Text="Виберіть дату народження:" Margin="5"/>
-            <DatePicker SelectedDate="{Binding BirthDate}" Margin="5"/>
-            <Button Content="Розрахувати"  Click="Calculate_Click" Margin="5"/>
-            <TextBlock Text="{Binding AgeText}" Margin="5" FontWeight="Bold"/>
-            <TextBlock Text="Західний знак зодіаку:" Margin="5"/>
-            <TextBlock Text="{Binding WesternZodiac}" Margin="5" FontWeight="Bold"/>
-            <TextBlock Text="Китайський знак зодіаку:" Margin="5"/>
-            <TextBlock Text="{Binding ChineseZodiac}" Margin="5" FontWeight="Bold"/>
+            <TextBlock Text="Введіть ім'я:" Margin="5"/>
+            <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <TextBlock Text="Введіть прізвище:" Margin="5"/>
+            <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+            <TextBlock Text="Введіть електронну пошту:" Margin="5"/>
+            <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <TextBlock Text="Введіть дату народження:" Margin="5"/>
+            <DatePicker SelectedDate="{Binding DateOfBirth, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
+            <Button Content="Proceed" Command="{Binding ProceedCommand}" IsEnabled="{Binding CanProceed}" Margin="5"/>
+            <TextBlock Text="{Binding Result}" TextWrapping="Wrap" Margin="5"/>
         </StackPanel>
     </Grid>
 </Window>

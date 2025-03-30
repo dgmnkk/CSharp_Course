@@ -16,18 +16,12 @@ namespace Lab_Humeniuk
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MainViewModel _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
-            _viewModel = new MainViewModel();
-            DataContext = _viewModel;
+            DataContext = new MainViewModel();
         }
 
-        private void Calculate_Click(object sender, RoutedEventArgs e)
-        {
-            _viewModel.Calculate();
-        }
     }
 }
