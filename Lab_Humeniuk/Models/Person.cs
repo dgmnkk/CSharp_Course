@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lab_Humeniuk.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,22 @@ namespace Lab_Humeniuk.Models
 
         public Person(string firstName, string lastName, string email, DateTime? birthDate = null)
         {
+            if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
+                throw new InvalidEmailException();
+
+            if (birthDate.HasValue)
+            {
+                if (birthDate > DateTime.Now)
+                    throw new FutureDateBirthException();
+
+                if (CalculateAge(birthDate.Value) > 135)
+                    throw new MoreThan135YOException();
+            }
+            else
+            {
+                throw new UnknownDataException();
+            }
+
             FirstName = firstName;
             LastName = lastName;
             Email = email;
@@ -26,9 +43,7 @@ namespace Lab_Humeniuk.Models
         public Person(string firstName, string lastName, DateTime birthDate)
             : this(firstName, lastName, null, birthDate) { }
 
-        public int Age => BirthDate.HasValue ? (int)((DateTime.Now - BirthDate.Value).TotalDays / 365.25) : 0;
-
-        public bool IsAdult => Age >= 18;
+        public bool IsAdult => CalculateAge(BirthDate.Value) >= 18;
 
         public bool IsBirthday => BirthDate.HasValue &&
                                   BirthDate.Value.Day == DateTime.Now.Day &&
@@ -39,7 +54,7 @@ namespace Lab_Humeniuk.Models
 
         private string GetWesternZodiac(DateTime? birthDate)
         {
-            if (!birthDate.HasValue) return "Невідомо";
+            if (!birthDate.HasValue) throw new UnknownDataException();
 
             int day = birthDate.Value.Day, month = birthDate.Value.Month;
             return (month, day) switch
@@ -61,9 +76,29 @@ namespace Lab_Humeniuk.Models
 
         private string GetChineseZodiac(DateTime? birthDate)
         {
-            if (!birthDate.HasValue) return "Невідомо";
+            if (!birthDate.HasValue) throw new UnknownDataException();
             string[] animals = { "Мавпа", "Півень", "Собака", "Свиня", "Щур", "Бик", "Тигр", "Кролик", "Дракон", "Змія", "Кінь", "Коза" };
             return animals[birthDate.Value.Year % 12];
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private int CalculateAge(DateTime birthDate)
+        {
+            int age = DateTime.Now.Year - birthDate.Year;
+            if (birthDate > DateTime.Now.AddYears(-age)) age--;
+            return age;
         }
     }
 }

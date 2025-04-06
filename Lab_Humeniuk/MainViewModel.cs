@@ -3,6 +3,7 @@ using System.Windows.Input;
 using System.Windows;
 using Lab_Humeniuk.Models;
 using CommunityToolkit.Mvvm.Input;
+using Lab_Humeniuk.Exceptions;
 
 
 namespace Lab_Humeniuk
@@ -91,21 +92,38 @@ namespace Lab_Humeniuk
         {
             await Task.Run(() =>
             {
-                if (DateOfBirth > DateTime.Now || DateTime.Now.Year - DateOfBirth.Year > 135)
+                try
                 {
-                    System.Windows.MessageBox.Show("Дата народження некоректна!");
-                    return;
+                    var person = new Person(FirstName, LastName, Email, DateOfBirth);
+
+                    if (person.IsBirthday)
+                    {
+                        MessageBox.Show("З Днем Народження!");
+                    }
+
+                    Result = $"Ім'я: {person.FirstName}\nПрізвище: {person.LastName}\nEmail: {person.Email}\nДата народження: {person.BirthDate}\n" +
+                             $"Повнолітній: {person.IsAdult}\nЗнак зодіаку: {person.SunSign}\nКитайський знак: {person.ChineseSign}\nДень народження сьогодні: {person.IsBirthday}";
                 }
-
-                var person = new Person(FirstName, LastName, Email, DateOfBirth);
-
-                if (person.IsBirthday)
+                catch (FutureDateBirthException ex)
                 {
-                    System.Windows.MessageBox.Show("З Днем Народження!");
+                    MessageBox.Show(ex.Message);
                 }
-
-                Result = $"Ім'я: {person.FirstName}\nПрізвище: {person.LastName}\nEmail: {person.Email}\nДата народження: {person.BirthDate}\n" +
-                         $"Повнолітній: {person.IsAdult}\nЗнак зодіаку: {person.SunSign}\nКитайський знак: {person.ChineseSign}\nДень народження сьогодні: {person.IsBirthday}";
+                catch (MoreThan135YOException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                catch (InvalidEmailException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                catch (UnknownDataException ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Сталася помилка: " + ex.Message);
+                }
             });
         }
 
