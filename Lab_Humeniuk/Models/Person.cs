@@ -3,17 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Lab_Humeniuk.Models
 {
+    [Serializable]
     public class Person
     {
         public string FirstName { get; }
         public string LastName { get; }
         public string Email { get; }
         public DateTime? BirthDate { get; }
+        public bool IsAdult { get; }
+        public bool IsBirthday { get; }
+        public string SunSign { get; }
+        public string ChineseSign { get; }
 
+        public Person() { }
+
+        [JsonConstructor]
         public Person(string firstName, string lastName, string email, DateTime? birthDate = null)
         {
             if (!string.IsNullOrWhiteSpace(email) && !IsValidEmail(email))
@@ -36,21 +45,18 @@ namespace Lab_Humeniuk.Models
             LastName = lastName;
             Email = email;
             BirthDate = birthDate;
+            IsAdult = CalculateAge(birthDate.Value) >= 18;
+            IsBirthday = birthDate.HasValue &&
+                         birthDate.Value.Day == DateTime.Now.Day &&
+                         birthDate.Value.Month == DateTime.Now.Month;
+            SunSign = GetWesternZodiac(birthDate);
+            ChineseSign = GetChineseZodiac(birthDate);
         }
         public Person(string firstName, string lastName, string email)
            : this(firstName, lastName, email, null) { }
 
         public Person(string firstName, string lastName, DateTime birthDate)
             : this(firstName, lastName, null, birthDate) { }
-
-        public bool IsAdult => CalculateAge(BirthDate.Value) >= 18;
-
-        public bool IsBirthday => BirthDate.HasValue &&
-                                  BirthDate.Value.Day == DateTime.Now.Day &&
-                                  BirthDate.Value.Month == DateTime.Now.Month;
-
-        public string SunSign => GetWesternZodiac(BirthDate);
-        public string ChineseSign => GetChineseZodiac(BirthDate);
 
         private string GetWesternZodiac(DateTime? birthDate)
         {

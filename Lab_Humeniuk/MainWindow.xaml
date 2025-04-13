@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lab_Humeniuk"
         mc:Ignorable="d"
-        Title="Lab2" Height="500" Width="400">
-    <Grid Margin="10">
-        <StackPanel>
+        Title="Lab4" Height="600" Width="800">
+    <DockPanel>
+        <StackPanel Margin="5 60 0 0">
             <TextBlock Text="Введіть ім'я:" Margin="5"/>
             <TextBox Text="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
             <TextBlock Text="Введіть прізвище:" Margin="5"/>
@@ -16,9 +16,36 @@
             <TextBox Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
             <TextBlock Text="Введіть дату народження:" Margin="5"/>
             <DatePicker SelectedDate="{Binding DateOfBirth, UpdateSourceTrigger=PropertyChanged}" Margin="5" />
-            <Button Content="Proceed" Command="{Binding ProceedCommand}" IsEnabled="{Binding CanProceed}" Margin="5"/>
-            <TextBlock Text="Результат:" Margin="5"/>
-            <TextBlock Text="{Binding Result}" TextWrapping="Wrap" Margin="5"/>
+            <Button Content="Add user" Command="{Binding ProceedCommand}" IsEnabled="{Binding CanProceed}" Margin="5"/>
         </StackPanel>
-    </Grid>
+
+        <StackPanel Orientation="Horizontal" Margin="10" DockPanel.Dock="Top" HorizontalAlignment="Center">
+            <TextBlock Text="Filter:" Margin="5"/>
+            <TextBox Width="200" Margin="5" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox Width="150" Margin="5" SelectedItem="{Binding SelectedSortProperty}" ItemsSource="{Binding SortProperties}"/>
+            <Button Content="Sort" Width="75" Margin="5" Command="{Binding SortCommand}"/>
+            <Button Content="Save"  Width="75" Margin="5" Command="{Binding SaveCommand}" />
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding FilteredUsers}" AutoGenerateColumns="False" Margin="10" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}"/>
+                <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}"/>
+                <DataGridTextColumn Header="Email" Binding="{Binding Email}"/>
+                <DataGridTextColumn Header="Birth Date" Binding="{Binding BirthDate}"/>
+                <DataGridTextColumn Header="Adult" Binding="{Binding IsAdult}"/>
+                <DataGridTextColumn Header="Birthday Today" Binding="{Binding IsBirthday}"/>
+                <DataGridTextColumn Header="Sun Sign" Binding="{Binding SunSign}"/>
+                <DataGridTextColumn Header="Chinese Sign" Binding="{Binding ChineseSign}"/>
+                <DataGridTemplateColumn Header="Дії">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Видалити" Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                    CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 </Window>
